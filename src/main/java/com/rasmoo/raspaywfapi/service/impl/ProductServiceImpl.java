@@ -32,4 +32,9 @@ public class ProductServiceImpl implements ProductService {
         return repository.findByAcronym(acronym);
     }
 
+    @Override
+    public Flux<Product> findAllByName(String name) {
+        return repository.findAllByName(name);
+    }
+
 }

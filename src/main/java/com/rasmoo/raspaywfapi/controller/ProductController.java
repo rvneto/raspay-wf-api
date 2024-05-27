@@ -34,4 +34,9 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(service.findByAcronym(acronym));
     }
 
+    @GetMapping("name/{name}")
+    public ResponseEntity<Flux<Product>> findAllByName(@PathVariable("name") String name) {
+        return ResponseEntity.status(HttpStatus.OK).body(service.findAllByName(name));
+    }
+
 }
