@@ -11,4 +11,6 @@ public interface ProductService {
 
     Flux<Product> findAll();
 
+    Mono<Product> findByAcronym(String acronym);
+
 }
