@@ -1,9 +1,9 @@
 server:
-  servlet:
-    context-path: /raspay-api
   port: 8083
 
 spring:
   data:
     mongodb:
       uri: mongodb+srv://admin:admin@raspay-webflux-cluster.iegce5e.mongodb.net/raspay?retryWrites=true&w=majority&appName=raspay-webflux-cluster
+  webflux:
+    base-path: /raspay-api
