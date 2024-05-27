@@ -1,36 +1,39 @@
 package com.rasmoo.raspaywfapi.model;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.br.CPF;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document("customers")
-public class Customer {
+@Builder
+@Document("products")
+public class Product {
 
     @Id
     private String id;
 
-    @Email
-    private String email;
-
-    private String firstName;
-
-    private String lastName;
-
-    @CPF
-    @NotBlank
     @Indexed(unique = true)
-    private String cpf;
+    @Size(min = 6, max = 20)
+    private String acronym;
+
+    @NotBlank
+    private String name;
+
+    @NotNull
+    private BigDecimal currentPrice;
+
+    private LocalDateTime dtCreation = LocalDateTime.now();
 
 }
