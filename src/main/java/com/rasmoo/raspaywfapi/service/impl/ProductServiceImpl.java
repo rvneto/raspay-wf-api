@@ -6,6 +6,9 @@ import com.rasmoo.raspaywfapi.model.Product;
 import com.rasmoo.raspaywfapi.repository.ProductRepository;
 import com.rasmoo.raspaywfapi.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -18,33 +21,35 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
+    private final ProductRepository productRepository;
 
-    private final ProductRepository repository;
-    private final ProductMapper mapper;
+    private final ProductMapper productMapper;
+
     private final ReactiveMongoTemplate mongoTemplate;
 
     @Override
     public Mono<Product> create(ProductDto dto) {
-        return repository.save(mapper.toModel(dto));
+        return productRepository.save(productMapper.toModel(dto));
     }
 
     @Override
     public Flux<Product> findAll() {
-        return repository.findAll();
+        return productRepository.findAll();
     }
 
     @Override
     public Mono<Product> findByAcronym(String acronym) {
-        return repository.findByAcronym(acronym);
+        return productRepository.findByAcronym(acronym);
     }
 
     @Override
-    public Flux<Product> findAllByName(String name) {
-        return repository.findAllByName(name);
+    public Flux<Product> findAllByName(String name, int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return productRepository.findAllByName(name, pageable);
     }
 
     @Override
-    public Flux<Product> findAllByParams(String acronym, String name, String currentPrice) {
+    public Flux<Product> findAllByParams(String acronym, String name, String currentPrice, int pageNumber, int pageSize) {
 
         Criteria criteria = new Criteria();
 
@@ -59,11 +64,10 @@ public class ProductServiceImpl implements ProductService {
         if (!Objects.equals(currentPrice, "")) {
             criteria.and("currentPrice").lte(currentPrice);
         }
-
-        Query query = new Query();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("name"));
+        Query query = new Query().with(pageable);
         query.addCriteria(criteria);
 
         return mongoTemplate.find(query, Product.class);
     }
-
 }
