@@ -39,4 +39,13 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(service.findAllByName(name));
     }
 
+    @GetMapping("/params")
+    public ResponseEntity<Flux<Product>> findAllByParams(
+            @RequestParam(value = "acronym", required = false, defaultValue = "") String acronym,
+            @RequestParam(value = "name", required = false, defaultValue = "") String name,
+            @RequestParam(value = "currentPrice", required = false, defaultValue = "") String currentPrice
+    ) {
+        return ResponseEntity.status(HttpStatus.OK).body(service.findAllByParams(acronym, name, currentPrice));
+    }
+
 }
