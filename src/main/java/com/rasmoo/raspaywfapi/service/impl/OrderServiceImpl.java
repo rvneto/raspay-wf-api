@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
@@ -39,7 +41,10 @@ public class OrderServiceImpl implements OrderService {
                                     return Mono.error(() -> new BadRequestException("Discount can not be greater than currentPrice"));
                                 }
                                 order.setOriginalPrice(product.getCurrentPrice().subtract(dto.discount()));
+                            } else {
+                                order.setOriginalPrice(product.getCurrentPrice());
                             }
+                            order.setDtRegistedOrder(LocalDateTime.now());
                             order.setProduct(product);
                             order.setCustomer(customer);
                             return repository.save(order);
