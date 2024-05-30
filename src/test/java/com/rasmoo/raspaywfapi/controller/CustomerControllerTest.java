@@ -2,6 +2,7 @@ package com.rasmoo.raspaywfapi.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rasmoo.raspaywfapi.dto.CustomerDto;
 import com.rasmoo.raspaywfapi.model.Customer;
 import com.rasmoo.raspaywfapi.service.CustomerService;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -30,9 +32,10 @@ public class CustomerControllerTest {
 
     @Test
     void shouldReturnOnlyOneCustomerFilteredByCPF() throws JsonProcessingException {
-        Customer customer = new Customer();
-        customer.setId("123456");
-        customer.setCpf("12345678901");
+        Customer customer = Customer.builder()
+                .id("123456")
+                .cpf("12345678901")
+                .build();
 
         when(customerService.findAll("", "", "12345678901", 0, 1, "asc"))
                 .thenReturn(Flux.just(customer));
@@ -48,6 +51,36 @@ public class CustomerControllerTest {
                 .expectStatus().isOk()
                 .expectBody(String.class)
                 .isEqualTo(objectMapper.writeValueAsString(List.of(customer)));
+
+    }
+
+    @Test
+    void shouldSaveNewCustomer() throws JsonProcessingException {
+
+        Customer customerSaved = Customer.builder()
+                .id("123456")
+                .firstName("Roberto")
+                .lastName("de Vargas")
+                .email("robertovargas@gmail.com")
+                .cpf("47969997015")
+                .build();
+
+        CustomerDto customerRequest = new CustomerDto(
+                customerSaved.getFirstName(),
+                customerSaved.getLastName(),
+                customerSaved.getEmail(),
+                customerSaved.getCpf());
+
+        when(customerService.create(customerRequest))
+                .thenReturn(Mono.just(customerSaved));
+
+        webTestClient.post().uri("/v1/customer")
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(customerRequest)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(String.class)
+                .isEqualTo(objectMapper.writeValueAsString(customerSaved));
 
     }
 
