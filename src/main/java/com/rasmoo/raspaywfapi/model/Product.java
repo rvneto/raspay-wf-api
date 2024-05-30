@@ -34,6 +34,6 @@ public class Product {
     @NotNull
     private BigDecimal currentPrice;
 
-    private LocalDateTime dtCreation = LocalDateTime.now();
+    private LocalDateTime dtCreation;
 
 }
