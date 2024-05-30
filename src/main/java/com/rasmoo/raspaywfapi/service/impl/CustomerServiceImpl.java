@@ -1,6 +1,7 @@
 package com.rasmoo.raspaywfapi.service.impl;
 
 import com.rasmoo.raspaywfapi.dto.CustomerDto;
+import com.rasmoo.raspaywfapi.exception.NotFoundException;
 import com.rasmoo.raspaywfapi.mapper.CustomerMapper;
 import com.rasmoo.raspaywfapi.model.Customer;
 import com.rasmoo.raspaywfapi.repository.CustomerRepository;
@@ -22,24 +23,24 @@ import java.util.Objects;
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
-    private final CustomerRepository customerRepository;
+    private final CustomerRepository repository;
     private final CustomerMapper mapper;
     private final ReactiveMongoTemplate mongoTemplate;
 
     @Override
     public Mono<Customer> findById(String id) {
-        return customerRepository.findById(id)
-                .switchIfEmpty(Mono.error(new RuntimeException("Customer not found")));
+        return repository.findById(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("Customer not found")));
     }
 
     @Override
     public Mono<Customer> create(CustomerDto dto) {
-        return customerRepository.findByEmail(dto.email())
+        return repository.findByEmail(dto.email())
                 .flatMap(customer -> {
                     customer.setFirstName(dto.firstName());
                     customer.setLastName(dto.lastName());
-                    return customerRepository.save(customer);
-                }).switchIfEmpty(customerRepository.save(mapper.toModel(dto)));
+                    return repository.save(customer);
+                }).switchIfEmpty(repository.save(mapper.toModel(dto)));
     }
 
     @Override
