@@ -21,6 +21,8 @@ import static org.mockito.Mockito.when;
 @WebFluxTest(CustomerController.class)
 public class CustomerControllerTest {
 
+    private final static String URI = "/v1/customer";
+
     @Autowired
     private WebTestClient webTestClient;
 
@@ -41,7 +43,7 @@ public class CustomerControllerTest {
                 .thenReturn(Flux.just(customer));
 
         webTestClient.get().uri(uriBuilder ->
-                        uriBuilder.path("/v1/customer")
+                        uriBuilder.path(URI)
                                 .queryParam("pageNumber", 0)
                                 .queryParam("pageSize", 1)
                                 .queryParam("cpf", "12345678901")
@@ -74,13 +76,47 @@ public class CustomerControllerTest {
         when(customerService.create(customerRequest))
                 .thenReturn(Mono.just(customerSaved));
 
-        webTestClient.post().uri("/v1/customer")
+        webTestClient.post().uri(URI)
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(customerRequest)
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(String.class)
                 .isEqualTo(objectMapper.writeValueAsString(customerSaved));
+
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenCPFIsInvalid() {
+
+        CustomerDto customerRequest = new CustomerDto(
+                "Roberto",
+                "de Vargas",
+                "robertovargas@gmail.com",
+                "12345678901");
+
+        webTestClient.post().uri(URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(customerRequest)
+                .exchange()
+                .expectStatus().isBadRequest();
+
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenEmailIsInvalid() {
+
+        CustomerDto customerRequest = new CustomerDto(
+                "Roberto",
+                "de Vargas",
+                "robertovargas",
+                "47969997015");
+
+        webTestClient.post().uri(URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(customerRequest)
+                .exchange()
+                .expectStatus().isBadRequest();
 
     }
 
