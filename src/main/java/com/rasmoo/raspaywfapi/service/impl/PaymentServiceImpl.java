@@ -46,7 +46,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private Mono<Payment> authorizePayment(Customer customer, Order order, CreditCard creditCard) {
-        if (creditCard.getCustomer().getId().equals(customer.getId()) ||
+        if (creditCard.getCustomerId().equals(customer.getId()) ||
                 creditCard.getDocumentNumber().equals(customer.getCpf())) {
             return savePayment(customer, order, creditCard, PaymentStatus.APPROVED);
         } else {
@@ -56,9 +56,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     private Mono<Payment> savePayment(Customer customer, Order order, CreditCard creditCard, PaymentStatus status) {
         Payment payment = Payment.builder()
-                .order(order)
-                .customer(customer)
-                .creditCard(creditCard)
+                .orderId(order.getId())
+                .customerId(customer.getId())
+                .creditCardId(creditCard.getId())
                 .status(status)
                 .dtRegistedPayment(LocalDateTime.now())
                 .build();

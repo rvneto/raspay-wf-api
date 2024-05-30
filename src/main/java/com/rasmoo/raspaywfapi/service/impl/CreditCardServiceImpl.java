@@ -27,7 +27,7 @@ public class CreditCardServiceImpl implements CreditCardService {
     @Override
     public Mono<CreditCard> create(CreditCardDto creditCardDto, Customer customer) {
         CreditCard creditCard = mapper.toModel(creditCardDto);
-        creditCard.setCustomer(customer);
+        creditCard.setCustomerId(customer.getId());
         return repository.save(creditCard);
     }
 }
